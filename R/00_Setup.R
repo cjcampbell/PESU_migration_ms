@@ -32,7 +32,7 @@ wd$bin     <- file.path( my_dir_path, "bin" )
 wd$data    <- file.path( my_dir_path, "data" )
 wd$iucn    <- file.path( my_dir_path, "data", "iucn" )
 wd$figs    <- file.path( my_dir_path, "figs" )
-wd$out     <- file.path( my_dir_path, "out" )
+wd$results     <- file.path( my_dir_path, "results" )
 
 # Check for presence of subdirectories. Create if needed.
 invisible({
