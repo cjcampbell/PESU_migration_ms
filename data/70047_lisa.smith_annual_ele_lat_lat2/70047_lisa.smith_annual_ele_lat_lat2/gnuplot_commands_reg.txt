@@ -1,0 +1,9 @@
+set term png
+set output '/depot/ssg/isomap/data/isomap-prod/portal/lisa.smith/jobs/70047/qqplotreg.png' 
+set xlabel 'Theoretical Quantile' 
+set ylabel 'Model Residual (ppt)  ' 
+plot '< tail -n +2 /depot/ssg/isomap/data/isomap-prod/portal/lisa.smith/jobs/70047/qqplot.reg' title 'Q-Q plot for regression model' 
+set output '/depot/ssg/isomap/data/isomap-prod/portal/lisa.smith/jobs/70047/residualplotreg.png' 
+set xlabel 'Predicted Value (ppt)  ' 
+set ylabel 'Model Residual (ppt)  ' 
+plot '< tail -n +2 /depot/ssg/isomap/data/isomap-prod/portal/lisa.smith/jobs/70047/residualplot.reg' title 'Residual plot for regression model' 

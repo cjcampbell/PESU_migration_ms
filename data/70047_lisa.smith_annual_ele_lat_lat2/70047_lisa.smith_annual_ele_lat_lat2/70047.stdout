@@ -1,0 +1,5 @@
+Host: halstead-a569.rcac.purdue.edu
+Job directory: /depot/ssg/isomap/data/isomap-prod/portal/lisa.smith/jobs/70047
+/depot/ssg/isomap/apps/isomap-prod/halstead/estimation_app_submit.sh lisa.smith 70047
+Estimation index is:0
+CV index is 0

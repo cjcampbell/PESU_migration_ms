@@ -1,0 +1,31 @@
+<add>
+<doc>
+	<field name="db_version">2.0</field>
+	<field name="lower_longitude">-103.7</field>
+	<field name="upper_year">2010</field>
+	<field name="reg_ivalue">0.316832</field>
+	<field name="time_mode">synoptic</field>
+	<field name="reg_pvalue">6.54764e-06</field>
+	<field name="reg_det_coefficient">0.920512</field>
+	<field name="upper_longitude">-69.3</field>
+	<field name="author">lisa.smith</field>
+	<field name="access">private</field>
+	<field name="geo_mse">35.3468</field>
+	<field name="extraction_date">1800-12-31T23:59:59Z</field>
+	<field name="extraction_filename"></field>
+	<field name="description">describe this run</field>
+	<field name="timestamp">2018-09-14T11:42:42Z</field>
+	<field name="case_name">annual_Lat_elev_map</field>
+	<field name="db_name">isomap_db</field>
+	<field name="lower_latitude">24.1</field>
+	<field name="key">70052</field>
+	<field name="output_directory">/depot/ssg/isomap/data/isomap-prod/portal/lisa.smith/jobs/70047</field>
+	<field name="stage">model_prediction</field>
+	<field name="proj4">+proj=longlat +ellps=wgs84 +datum=wgs84 +no_defs</field>
+	<field name="lower_year">1960</field>
+	<field name="upper_latitude">47.5</field>
+	<field name="model_type">precipitation</field>
+	<field name="reg_mse">0.0</field>
+
+</doc>
+</add>

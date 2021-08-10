@@ -1,0 +1,9 @@
+Estimate	Std	t-value	p-value
+Matern Correlation Function Used
+Smooth Paramete is 1
+Estimate of Correlation Parameter is:0.7526
+Estimate of Scale Parameter is: 336.459
+-121.776	50.5005	-2.41139	0.0202356
+-0.0228079	0.00392015	-5.81814	6.71951e-07
+-0.151028	0.038168	-3.95692	0.000279704
+8.0981	2.80991	2.88198	0.00614429

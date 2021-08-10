@@ -1,0 +1,31 @@
+<add>
+<doc>
+	<field name="db_version">2.0</field>
+	<field name="lower_longitude">-164.1</field>
+	<field name="upper_year">2009</field>
+	<field name="reg_ivalue">0.319283</field>
+	<field name="time_mode">synoptic</field>
+	<field name="reg_pvalue">4.6201e-11</field>
+	<field name="reg_det_coefficient">0.885165</field>
+	<field name="upper_longitude">-43.9</field>
+	<field name="author">dnelson99</field>
+	<field name="access">private</field>
+	<field name="geo_mse">171.825</field>
+	<field name="extraction_date">1800-12-31T23:59:59Z</field>
+	<field name="extraction_filename"></field>
+	<field name="description">describe this run</field>
+	<field name="timestamp">2019-04-17T10:43:53Z</field>
+	<field name="case_name">May_aug_ele_lat_lat2</field>
+	<field name="db_name">isomap_db</field>
+	<field name="lower_latitude">23.3</field>
+	<field name="key">73715</field>
+	<field name="output_directory">/depot/ssg/isomap/data/isomap-prod/portal/dnelson99/jobs/73713</field>
+	<field name="stage">model_prediction</field>
+	<field name="proj4">+proj=longlat +ellps=wgs84 +datum=wgs84 +no_defs</field>
+	<field name="lower_year">1980</field>
+	<field name="upper_latitude">69.1</field>
+	<field name="model_type">precipitation</field>
+	<field name="reg_mse">0.0</field>
+
+</doc>
+</add>
