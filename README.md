@@ -141,4 +141,4 @@ loaded via a namespace (and not attached):
 
 <sup>3</sup>. Magozzi, Sarah, Clement P. Bataille, Keith A. Hobson, Michael B. Wunder, John D. Howa, Andrea Contina, Hannah B. Vander Zanden, and Gabriel J. Bowen. "Calibration chain transformation improves the comparability of organic hydrogen and oxygen stable isotope data." Methods in Ecology and Evolution 12, no. 4 (2021): 732-747. https://doi.org/10.1111/2041-210X.13556
 
-<sup>4</sup> [DarwinCore#coordinatePrecition](https://dwc.tdwg.org/terms/#dwc:coordinatePrecision)
+<sup>4</sup> [DarwinCore#coordinatePrecision](https://dwc.tdwg.org/terms/#dwc:coordinatePrecision)
