@@ -2,8 +2,8 @@
 
 Code and data used to generate results and figures of "Subtropical tri-colored bats (Perimyotis subflavus) migrate poleward in autumn" manuscript. If you clone this repository, results and figures are largely replicable-- note that the data we have included contains coordinates to caves that, as sensitive information, have been obscured post-analysis.
 
-# This repository contains:
-## /R/
+## This repository contains:
+### /R/
 Scripts used to read, tidy, and standardize data and run analyses.
 | Script                                 | Description |
 | -----------                            | ----------- |
@@ -17,13 +17,13 @@ Scripts used to read, tidy, and standardize data and run analyses.
 | 08_CombineOutputs.R                    | Combine results into a tidy dataframe |
 | 09_modelFitting.R                      | Linear modeling to test predictive power of variables on distance traveled by individuals |
 
-## /results/
-### ms_figs.R
+### /results/
+#### ms_figs.R
 Code used to generate figures used in manuscript.
 
 
-## /data/
-### dD_analyzed_obscuredCoords.csv 
+### /data/
+#### dD_analyzed_obscuredCoords.csv 
 Contains individual bat collection data and &#948;D results. This includes samples collected as part of this study (analysisLab == "CASIF") and for Fraser et al. 2021. (analysisLab == "UWO")<sup>1</sup> [https://doi.org/10.1371/journal.pone.0031419]
 
 
@@ -42,10 +42,10 @@ Contains individual bat collection data and &#948;D results. This includes sampl
 | analysisLab | Stable isotope analysis lab where samples were analyzed for &#948;D values. Important because different standards were used at each lab -- see text of this ms and also <sup>3</sup>. |
 | coordinatePrecision | Decimal representation of the precision of coordinates from decimalLatitude and decimalLongitude<sup>4</sup>. |
 
-### /iucn/
+#### /iucn/
 Contains IUCN redlist range map information, downloaded from https://www.iucnredlist.org/. Citation: Solari, S. 2018. IUCN Red List of Threatened Species: Perimyotis subflavus. https://dx.doi.org/10.2305/IUCN.UK.2018-2.RLTS.T17366A22123514.en
 
-### Isoscape data
+#### Isoscape data
 - 66098_caitjcampbell_JJA_NoAm_Map_1980_2009/
 - 66100_caitjcampbell_Annual_NoAm_Map_H_1980_2010/
 - 70047_lisa.smith_annual_ele_lat_lat2/
@@ -56,7 +56,7 @@ Contains IUCN redlist range map information, downloaded from https://www.iucnred
 
 Candidate isoscapes generated from [IsoMAP](https://isomap.rcac.purdue.edu/isomap/)
 
-# Session Info
+## Session Info
 All analyses were conducted with the following configuration:
 
 ```
@@ -136,7 +136,7 @@ loaded via a namespace (and not attached):
 
 
 
-# Cited
+## Cited
 
 <sup>1</sup>. Fraser, E. E., McGuire, L. P., Eger, J. L., Longstaffe, F. J., & Fenton, M. B. (2012). Evidence of latitudinal migration in tri-colored bats, Perimyotis subflavus. PLoS One, 7(2), e31419. https://doi.org/10.1371/journal.pone.0031419
 
