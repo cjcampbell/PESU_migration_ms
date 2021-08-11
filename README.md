@@ -17,6 +17,9 @@ Scripts used to read, tidy, and standardize data and run analyses.
 | 08_CombineOutputs.R                    | Combine results into a tidy dataframe |
 | 09_modelFitting.R                      | Linear modeling to test predictive power of variables on distance traveled by individuals |
 
+## /results/
+### ms_figs.R
+Code used to generate figures used in manuscript.
 
 
 ## /data/
