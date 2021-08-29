@@ -62,8 +62,7 @@ PESUResults <- mydata_transformed %>%
     everything()
     ) %>% 
   full_join(dist_deets) %>% 
-  full_join(wns_deets) %>% 
   full_join(dir_deets_SHORTER) %>% 
   full_join(dir_deets) 
 
-write.csv(PESUResults, file = file.path(wd$bin, "PESUResults2.csv"))
+write.csv(PESUResults, file = file.path(wd$bin, "PESUResults2.csv"), row.names = F)
