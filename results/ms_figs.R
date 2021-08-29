@@ -455,7 +455,7 @@ ggsave(p_circleBar_bw, file = file.path(wd$figs, "p_circleBar_bw.png"),
 
 # Summary Origin Maps -----------------------------------------------------
 
-plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol = "black") {
+plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol = "black", textAnnotationSize = 3.5) {
   if(!exists("na")){
     na <- rnaturalearth::ne_countries(country = c("United States of America", "Canada", "Mexico"), returnclass = "sf", scale = "large") %>% 
       st_transform(crs = myCRS)
@@ -542,8 +542,8 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
     distinct
   
   # Top annotate location
-  northiesLabelLocation <- c(2e6, 0)
-  southiesLabelLocation <- c(2e6, -1e6)
+  northiesLabelLocation <- c(2e6-2e5, 0)
+  southiesLabelLocation <- c(2e6-2e5, -1e6)
   
   map_NC <- u +
     geom_point(samplingLocations_NC, mapping = aes(x=metersLongitude, y = metersLatitude), color = pointcol) +
@@ -552,7 +552,7 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
     annotate(
       geom = "text", 
       x=southiesLabelLocation[1]+5e4, y = southiesLabelLocation[2], color = "black",
-      hjust = 0, size = 2.5,
+      hjust = 0, size = textAnnotationSize,
       label = "Sixteen bats moved\n>100km from southerly\nsummering grounds."
     ) +
     annotate(
@@ -606,18 +606,14 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
   samplingLocations_NW <- ORSim_Northwest %>% 
     dplyr::select(metersLongitude, metersLatitude) %>% 
     distinct
-  
-  # Top annotate location
-  northiesLabelLocation <- c(2e6, 0)
-  southiesLabelLocation <- c(2e6, -1e6)
-  
+
   map_NW <- u  +
     geom_point(samplingLocations_NW, mapping = aes(x=metersLongitude, y = metersLatitude), color = pointcol) +
     labs(subtitle = "Northwest Florida hibernacula") +
     annotate(
       geom = "text", 
       x=northiesLabelLocation[1]+5e4, y = northiesLabelLocation[2], color = "black",
-      hjust = 0, size = 2.5,
+      hjust = 0, size = textAnnotationSize,
       label = "Three individuals moved\n>100km from northerly\nsummering grounds."
     ) +
     annotate(
@@ -636,7 +632,7 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
     annotate(
       geom = "text", 
       x=southiesLabelLocation[1]+5e4, y = southiesLabelLocation[2], color = "black",
-      hjust = 0, size = 2.5,
+      hjust = 0, size = textAnnotationSize,
       label = "Thirty-two bats moved\n>100km from southerly\nsummering grounds."
     ) +
     annotate(
