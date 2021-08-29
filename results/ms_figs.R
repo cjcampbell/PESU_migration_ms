@@ -340,7 +340,6 @@ makeCompassRose <- function(myColors, add_n_labels = FALSE) {
     theme_bw() +
     theme(
       panel.grid = element_blank(),
-      #panel.grid.major.x = element_line(color="grey70"),
       axis.title = element_blank(),
       axis.text.y = element_blank(),
       axis.text.x = element_text(size = 12.5),
@@ -390,11 +389,6 @@ makeCompassRose <- function(myColors, add_n_labels = FALSE) {
     return(p_circlePoints)
   }
 }
-
-# p_circlePoints <- makeCompassRose(myColors = c("#f9de59", "#e8a628", "#f98365"),
-#                                   add_n_labels = FALSE)
-# ggsave(p_circlePoints, filename = file.path(wd$figs, "p_circlePoints_color.png"), 
-#        units = "in", width = 12)
 
 ## Stacked bar plots
 
