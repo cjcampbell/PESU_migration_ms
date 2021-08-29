@@ -157,27 +157,9 @@ mydata_PoOatSampleSite <- probs_at_site_df %>%
   full_join(mydata_transformed) %>%
   tidyr::pivot_longer(cols = starts_with("probVal_"), names_to = "method", values_to = "valAtSampleSite")
 
-# # Because of questions about spatial bias, I am going to use odds-ratios for
-# # known-origin individuals sampled within a certain distance of the unknown-
-# # origin individuals.
-# 
-# # Find distance to centroid for all known-origin points.
-# dists2Centroid <- mydata_PoOatSampleSite %>% 
-#   dplyr::select(decimalLongitude, decimalLatitude) %>% 
-#   as.data.frame() %>% 
-#   SpatialPoints() %>% 
-#   geosphere::distGeo(., unknown_centroid)/1e4 # convert to km.
-# 
-# mydata_dists2Centroid <- mydata_PoOatSampleSite %>% 
-#   data.frame(., dist2centroid = dists2Centroid)
-# 
-# saveRDS(mydata_dists2Centroid, file = file.path(wd$bin, "mydata_dists2Centroid.rds"))
 
 # Make odds-simulation surfaces ---------------------------------------
 
-# NOT CURRENTLY FILTERING OUT DISTANT BATS!
-
-#mydata_dists2Centroid <- readRDS( file.path(wd$bin, "mydata_dists2Centroid.rds") )
 # Parametric bootstrapping
 oddsvals <- mydata_PoOatSampleSite %>%
   filter(Season == "Summer", method == "probVal_OR") %>%
@@ -189,14 +171,6 @@ oddsvals <- mydata_PoOatSampleSite %>%
 set.seed(42)
 sampledoddsvals <- sample(oddsvals, size = 1e5, replace = T)
 
-# data.frame(value = sampledQuantvals, method = "quant") %>% 
-#   rbind({
-#     data.frame(value = sampledoddsvals, method = "or") 
-#   }) %>% 
-#   ggplot() +
-#   aes(value, fill = value) +
-#   geom_histogram() +
-#   facet_wrap(~method)
 
 # Conduct odds-simulation to make surfaces using odds of
 # known_origin individuals.
@@ -226,19 +200,12 @@ distDir_ORSim$OR_sim <- pbmcapply::pbmclapply(
 
 saveRDS(distDir_ORSim, file = file.path(wd$bin, "distDir_ORSim.rds"))
 
-# minDistDeets <- distDir_ORSim %>% 
-#   group_by(ID) %>% 
-#   dplyr::filter(OR_sim > 0.5) %>% 
-#   slice(which.min(dist_km)) 
-# 
-
 minDistDeets0 <- pbmcapply::pbmclapply(
   seq(0,1,by=0.01), 
   mc.cores = parallel::detectCores(),
   function(j) {
     distDir_ORSim %>% 
       dplyr::mutate(threshold = j) %>% 
-      #dplyr::filter(ID == myIndiv) %>% 
       dplyr::filter(OR_sim >= j) %>% 
       dplyr::group_by(ID, threshold) %>% 
       dplyr::summarise(minDist = min(dist_km, na.rm = T))
@@ -247,117 +214,3 @@ minDistDeets0 <- pbmcapply::pbmclapply(
 minDistDeets <- full_join(minDistDeets0, mydata)
 saveRDS(minDistDeets, file = file.path(wd$bin, "minDistDeets.rds"))
 
-
-# Extra plots -------------------------------------------------------------
-# 
-# mydata_dists2Centroid %>% 
-#   ggplot() +
-#   aes(x = dist2centroid, y = valAtSampleSite, color = Season) +
-#   geom_point() +
-#   facet_grid(rows = vars(method), scales="free")
-# Main takeaway from this figure: Biased lower-than-known-origin "raw" normalized values
-# really throw things askew! But the picture looks better (more tractable) for OR
-# and quantile values. I'm thinking we should go with odds ratios.
-# 
-# 
-# mydata_PoOatSampleSite %>%
-#   ggplot() +
-#   aes(valAtSampleSite, color = Season, group = Season) +
-#   geom_density() +
-#   facet_grid(rows = vars(method), scales = "free")
-# mydata_PoOatSampleSite %>%
-#   ggplot() +
-#   aes(valAtSampleSite, fill = Season, group = Season) +
-#   geom_histogram() +
-#   facet_grid(cols = vars(method), rows = vars(Season), scales = "free")
-# 
-# mydata_PoOatSampleSite %>%
-#   filter(method == "probVal_OR") %>% 
-#   #filter(Season == "Summer") %>% 
-#   ggplot() +
-#   aes(x = decimalLongitude, y = decimalLatitude, shape = Season, color = valAtSampleSite) +
-#   scale_shape_manual(values = c(15,21)) +
-#   geom_jitter(width = 2, height = 2, size = 2) +
-#   ggthemes::theme_tufte()
-# 
-# mydata_PoOatSampleSite %>%
-#   filter(method == "probVal_OR") %>% 
-#   #filter(Season == "Summer") %>% 
-#   ggplot() +
-#   aes(y = valAtSampleSite, x = decimalLatitude, shape = Season, color = valAtSampleSite) +
-#   scale_shape_manual(values = c(15,21)) +
-#   geom_jitter(width = 0.5, height = 0.5, size = 2) +
-#   ggthemes::theme_tufte()
-# 
-# mydata_PoOatSampleSite %>%
-#   filter(method == "probVal_OR") %>% 
-#   dplyr::mutate(approxLat = floor(decimalLatitude)) %>% 
-#   ggplot() +
-#   aes(y = valAtSampleSite, x = approxLat, group = interaction(Season, approxLat), color = Season ) +
-#   scale_shape_manual(values = c(15,21)) +
-#   geom_boxplot() +
-#   geom_jitter(width = 1, height = 0) +
-#   ggthemes::theme_tufte()
-# 
-# mydata_dists2Centroid %>%
-#   filter(method == "probVal_OR") %>% 
-#   ggplot() +
-#   aes(y = valAtSampleSite, x = dist2centroid, color = Season ) +
-#   geom_point() +
-#   ggthemes::theme_tufte()
-# 
-# mydata_dists2Centroid %>% filter(method == "probVal_OR") %>% 
-#   filter(dist2centroid < 100) %>% 
-#   group_by(Season) %>% 
-#   dplyr::summarise(n = n())
-# 
-# mydata_dists2Centroid %>%
-#   filter(method == "probVal_OR") %>% 
-#   { rbind({
-#     mutate(., included = "all")
-#   },{
-#     filter(., dist2centroid < 100) %>% mutate(included = "under100")
-#     }
-#   )} %>% 
-#   ggplot() +
-#   aes(valAtSampleSite, color = interaction(Season, included) ) +
-#   geom_density() +
-#   ggthemes::theme_tufte()
-# 
-# data.frame(value = sampledQuantvals, method = "quant") %>% 
-#   rbind({
-#     data.frame(value = sampledoddsvals, method = "or") 
-#   }) %>% 
-#   ggplot() +
-#   aes(value, fill = value) +
-#   geom_histogram() +
-#   facet_wrap(~method)
-
-
-threshold <- 0.5
-distDir_ORSim %>% 
-  dplyr::mutate(dist_km = unlist(dist_km)) %>% 
-  #dplyr::filter(OR_sim >= threshold) %>% 
-  dplyr::group_by(ID) %>% 
-  arrange(dist_km) %>% 
-  dplyr::slice(1) %>% # estimate of at sample site.
-  ggplot() +
-  aes(OR_sim, fill = Season) +
-  geom_histogram() +
-  facet_grid(~Season)
-
-distDir_ORSim %>% 
-  dplyr::mutate(dist_km = unlist(dist_km)) %>% 
-  dplyr::filter(OR_sim >= threshold) %>% 
-  dplyr::group_by(ID) %>% 
-  arrange(dist_km) %>% 
-  dplyr::slice(1) %>%  
-  ggplot() +
-  aes(dist_km, color = Season) +
-  geom_density()
-
-
-# Check ORsim vals for known origin indivs --------------------------------
-
-distDir_ORSim %>% filter(Season == "Summer") %>% 
-  {plot(ecdf(.$OR))}

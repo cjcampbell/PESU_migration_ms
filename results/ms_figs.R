@@ -27,68 +27,16 @@ theme_set(theme_light())
 # This helps keep multiple spatial layers playing nicely with one another.
 my_extent <- raster::extent(-178, -30, 10, 80)
 
-# 
+
 if(!exists("maps_df")) maps_df <- readRDS(file.path(wd$bin, "maps_df.rds"))
 source(file.path(wd$R, "00_Setup.R"))
 source(file.path(wd$R, "01_loadIsotopeData.R"))
 
 ## Load results ##
-# Load clustering results
-if(!exists("mydata_clustered")) load(file.path(wd$bin, "mydata_clustered.Rdata"))
-
 
 # Load dD analysis results
-myResults <- read_csv( file.path(wd$bin, "PESUResults2.csv") )
+myResults <- read.csv( file.path(wd$bin, "myResults.csv") )
 
-# Which direction is most likely origin?
-myResults$mostLikelyDirection <- names(myResults)[27:30][max.col(myResults[,27:30])]
-# Which degree has most likely origin?
-myResults <- mutate_at(myResults, c(31:391), ~replace(., is.na(.), 0)) # replace NA with 0
-myResults$mostLikelyAngle <- names(myResults)[31:391][max.col(myResults[,31:391])] %>% 
-  gsub("probOfOriginAtAngle_","",.) %>% 
-  as.numeric()
-# FINALLY combine with clustering info and pull out some summaries.
-myResults <- myResults %>% 
-  full_join(mydata_clustered, by = "ID") %>% 
-  dplyr::mutate(
-    mostLikelyDiagonal = case_when(
-      mostLikelyAngle >= 0 &  mostLikelyAngle < 90 ~ "NE",
-      mostLikelyAngle >= -90 &  mostLikelyAngle < 0 ~ "NW",
-      mostLikelyAngle >= -180 &  mostLikelyAngle < -90 ~ "SW",
-      mostLikelyAngle >= 90 &  mostLikelyAngle < 180 ~ "SE"
-    ),
-    mostLikelyDiagonal = factor(mostLikelyDiagonal, levels = c("NE", "SE", "SW", "NW")),
-    NorthOrSouth = case_when(
-      mostLikelyDiagonal %in% c("NW", "NE") ~ "North",
-      mostLikelyDiagonal %in% c("SW", "SE") ~ "South"),
-    distanceTraveled = case_when(
-      probDistTraveledAtThreshold_0.25 < 100 ~ "Resident",
-      probDistTraveledAtThreshold_0.25 >= 100 & 
-        probDistTraveledAtThreshold_0.25 <1000 ~ "Regional",
-      probDistTraveledAtThreshold_0.25 >= 1000 ~"Long-distance"
-    ),
-    distanceTraveled = factor(distanceTraveled, levels = c("Resident", "Regional", "Long-distance")),
-    distDir = case_when(
-      distanceTraveled == "Resident" ~ "Resident",
-      distanceTraveled == "Regional" & NorthOrSouth == "North" ~ "Regional-N",
-      distanceTraveled == "Regional" & NorthOrSouth == "South" ~ "Regional-S",
-      distanceTraveled == "Long-distance" & NorthOrSouth == "North" ~ "Long-distance-N",
-      distanceTraveled == "Long-distance" & NorthOrSouth == "South" ~ "Long-distance-S"
-    ),
-    Region_long = case_when(
-      Region == "NW" ~ "Northwest",
-      Region == "NC" ~ "North-central"
-    ),
-    Region_long = factor(Region_long, levels = c("Northwest", "North-central")),
-    # Specify season_lab:
-    seasonLab = paste(Season, analysisLab, sep = "_"),
-    seasonLab = factor(seasonLab, levels=c("Summer_UWO", "Summer_CASIF", "Winter_CASIF"))
-  ) %>% 
- # Remove angle data...
-  dplyr::select_at(vars(!starts_with("probOfOriginAtAngle"))) %>% 
-  dplyr::select_at(vars(!starts_with("propSimulations")))
-
-rm(mydata_clustered)
 # Load sma results
 mydata_isoVals <- readRDS( file.path(wd$bin, "mydata_isoVals.Rds") )
 load(file.path(wd$bin, "bestFitIso.rdata"))
