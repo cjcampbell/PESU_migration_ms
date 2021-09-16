@@ -45,12 +45,12 @@ allModeldf <- data.frame(rbind(model1Frame, model2Frame)) %>%
   dplyr::mutate(
     modelName = factor(modelName, levels = c("Global Model","Top Model")),
     Variable = case_when(
-      Variable == "Region_longNorth-central" ~ "Hib. Region (N-C)",
-      Variable == "SizeSmall" ~ "Hib. Size (Small)",
+      Variable == "Region_longNorth-central" ~ "Karst Region (N-C)",
+      Variable == "SizeSmall" ~ "Colony Size (Small)",
       Variable == "SexMale" ~ "Sex (Male)",
       TRUE ~ Variable
       ),
-      Variable = factor(Variable, levels = rev(c("Hib. Region (N-C)", "Hib. Size (Small)", "Sex (Male)", "(Intercept)")))
+      Variable = factor(Variable, levels = rev(c("Karst Region (N-C)", "Colony Size (Small)", "Sex (Male)", "(Intercept)")))
     )
 
 save(m2, m1, allModeldf,  file = file.path(wd$bin, "modelResults.Rdata"))
@@ -68,3 +68,4 @@ gtsummary::tbl_regression(m2)
 
 # Plot resids.
 plot(m2)
+sjPlot::plot_model(m2)

@@ -171,14 +171,6 @@ load(file.path(wd$bin,"modelResults.Rdata"))
 myThresh <- 0.25
 myinterval <- -qnorm((1-0.95)/2)  # 95%
 
-allModeldf_tidy <- allModeldf %>% 
-  dplyr::mutate(
-    Variable = case_when(
-      Variable == "Hib. Size (Small)" ~ "Colony Size (Small)",
-      Variable == "Hib. Region (N-C)" ~ "Karst Region (N-C)"
-    )
-    )
-
 makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red", "grey50")){
   suppressMessages({suppressWarnings({
     set.seed(42)
@@ -250,7 +242,7 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
     box_region <- grid.arrange(box_region, bottom = textGrob(subtit, x = 0.55, y = 1, gp = gpar(fontsize = 11)))
     
     # Model Outputs
-    coeff_plot <- ggplot(allModeldf_tidy, aes(colour = modelName, linetype = modelName)) + 
+    coeff_plot <- ggplot(allModeldf, aes(colour = modelName, linetype = modelName)) + 
       geom_vline(xintercept = 0, colour = "grey20", lty = 5) +
       geom_pointrange(aes(y = Variable, x = Coefficient, xmin = Coefficient - SE*myinterval,
                           xmax = Coefficient + SE*myinterval),
