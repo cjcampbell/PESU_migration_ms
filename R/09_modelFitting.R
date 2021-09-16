@@ -9,7 +9,8 @@ myResults <- read.csv( file.path(wd$bin, "myResults.csv") )
 
 df <- myResults %>% 
   filter(Season == "Winter") %>% 
-  filter(!is.na(Sex), !is.na(Size), !is.na(Region_long))
+  filter(!is.na(Sex), !is.na(Size), !is.na(Region_long)) %>% 
+  dplyr::mutate(Region_long = factor(Region_long, levels = rev(c("North-central", "Northwest"))))
 
 
 # Fit global model --------------------------------------------------------
