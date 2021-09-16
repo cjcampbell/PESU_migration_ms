@@ -251,7 +251,7 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
       ggpubr::theme_pubr() +
       scale_color_manual(values = coeffColors) +
       scale_linetype_manual(values = c(1,1)) +
-      theme(legend.position = c(0.15,0.1),  legend.box = "vertical", legend.title = element_blank())
+      theme(legend.position = c(0.16,0.1),  legend.box = "vertical", legend.title = element_blank())
     
     boxplots <- arrangeGrob(grobs = list(
       grid.arrange(box_region , top = grid::textGrob(label = 'A', x = 0, hjust = 0, gp = gpar(fontsize = 16))) , 
