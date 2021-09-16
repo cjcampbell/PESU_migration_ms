@@ -171,6 +171,14 @@ load(file.path(wd$bin,"modelResults.Rdata"))
 myThresh <- 0.25
 myinterval <- -qnorm((1-0.95)/2)  # 95%
 
+allModeldf_tidy <- allModeldf %>% 
+  dplyr::mutate(
+    Variable = case_when(
+      Variable == "Hib. Size (Small)" ~ "Colony Size (Small)",
+      Variable == "Hib. Region (N-C)" ~ "Karst Region (N-C)"
+    )
+    )
+
 makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red", "grey50")){
   suppressMessages({suppressWarnings({
     set.seed(42)
@@ -209,7 +217,7 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
           ggplot2::scale_color_manual(values = myColors),
           scale_y_continuous( name = "Minimum Distance Moved (km)"),
           scale_x_discrete(position = "top") ,
-          xlab("Hibernaculum Size"),
+          xlab("Colony Size"),
           ggpubr::theme_pubclean(),
           theme(legend.position = "none")
           ),
@@ -229,7 +237,7 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
         centrality.point.args = list(size = 5, color = mean.color),
         ggplot.component	= list(
           ggplot2::scale_color_manual(values = myColors),
-          xlab("Hibernaculum Region"),
+          xlab("Karst Region"),
           scale_y_continuous( name = "Minimum Distance Moved (km)"),
           scale_x_discrete(position = "top") ,
           ggpubr::theme_pubclean(),
@@ -242,13 +250,12 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
     box_region <- grid.arrange(box_region, bottom = textGrob(subtit, x = 0.55, y = 1, gp = gpar(fontsize = 11)))
     
     # Model Outputs
-    coeff_plot <- ggplot(allModeldf, aes(colour = modelName, linetype = modelName)) + 
+    coeff_plot <- ggplot(allModeldf_tidy, aes(colour = modelName, linetype = modelName)) + 
       geom_vline(xintercept = 0, colour = "grey20", lty = 5) +
       geom_pointrange(aes(y = Variable, x = Coefficient, xmin = Coefficient - SE*myinterval,
                           xmax = Coefficient + SE*myinterval),
                       lwd = 1/2, position = position_dodge(width = 1/2),
                       shape = 21, fill = "WHITE") +
-      #scale_y_discrete(breaks = rev(levels(allModeldf$Variable)), labels =  rev(levels(allModeldf$Variable))) + 
       ggpubr::theme_pubr() +
       scale_color_manual(values = coeffColors) +
       scale_linetype_manual(values = c(1,1)) +
