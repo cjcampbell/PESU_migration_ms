@@ -27,7 +27,6 @@ theme_set(theme_light())
 # This helps keep multiple spatial layers playing nicely with one another.
 my_extent <- raster::extent(-178, -30, 10, 80)
 
-
 if(!exists("maps_df")) maps_df <- readRDS(file.path(wd$bin, "maps_df.rds"))
 source(file.path(wd$R, "00_Setup.R"))
 source(file.path(wd$R, "01_loadIsotopeData.R"))
@@ -35,7 +34,12 @@ source(file.path(wd$R, "01_loadIsotopeData.R"))
 ## Load results ##
 
 # Load dD analysis results
-myResults <- read.csv( file.path(wd$bin, "myResults.csv") )
+myResults <- read.csv( file.path(wd$bin, "myResults.csv") ) %>% 
+  # Get factors in the right order
+  dplyr::mutate(
+    distanceTraveled = factor(distanceTraveled, levels = c("Resident", "Regional", "Long-distance")),
+    Region_long = factor(Region_long, levels = c("Northwest", "North-central"))
+  )
 
 # Load sma results
 mydata_isoVals <- readRDS( file.path(wd$bin, "mydata_isoVals.Rds") )
@@ -304,8 +308,8 @@ makeCompassRose <- function(myColors, add_n_labels = FALSE) {
     geom_vline(xintercept = c(-180,0), color = "grey50", size = 0.2) +
     geom_vline(xintercept = c(-90,90), color = "grey50", size = 0.4) +
     # Tick marks.
-    geom_segment( color = "grey50", x = -89, xend = -91, y = 1, yend = 1) +
-    geom_text(size = 5, color = "grey50", x= -91, y = 1, label = "10 km", angle = 45, vjust = 0, hjust = 0) +
+    #geom_segment( color = "grey50", x = -89, xend = -91, y = 1, yend = 1) +
+    #geom_text(size = 5, color = "grey50", x= -91, y = 1, label = "10 km", angle = 45, vjust = 0, hjust = 0) +
     
     geom_segment(color = "grey50", x = -89, xend = -91, y = 2, yend = 2) +
     geom_text(size = 5, color = "grey50", x= -91, y = 2, label = "100 km", angle = 45, vjust = 0, hjust = 0) +
@@ -327,7 +331,7 @@ makeCompassRose <- function(myColors, add_n_labels = FALSE) {
       labels = c("S", "W", "N", "E")
     ) +
     scale_y_continuous(
-      breaks = log10(c(0,100,1000)), 
+      breaks = log10(c(0,100,1000)),
       limits = c(0,log10(5000)),
       expand = c(0,0)
     ) +
@@ -404,7 +408,11 @@ makeCompassBarPlots <- function(myColors = c("#f9de59", "#e8a628", "#f98365"), a
     dplyr::mutate(mylab = case_when(
       distanceTraveled == "Resident" ~ paste0("All Origins\nn = ", n),
       distanceTraveled != "Resident" ~ paste0(NS,"erly Origins\nn = ", n)
-    ))
+    )) %>% 
+    dplyr::mutate(
+      distanceTraveled = factor(distanceTraveled, levels = c("Resident", "Regional", "Long-distance")),
+      Region_long = factor(Region_long, levels = c("Northwest", "North-central"))
+      )
   
   tt_Northies <- filter(tt, n != 0, NS=="North") %>% 
     dplyr::mutate(y = case_when(
