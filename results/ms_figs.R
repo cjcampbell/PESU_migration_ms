@@ -12,6 +12,9 @@ library(ggstatsplot)
 library(ggpubr)
 library(patchwork)
 library(viridisLite)
+# rnaturalearth has a new required package. Can install with:
+# Sys.unsetenv("GITHUB_PAT")
+# devtools::install_github("ropensci/rnaturalearthhires")
 
 # Make an object to help navigate the subdirectories.
 wd <- list()
@@ -54,7 +57,7 @@ if(!exists("distDir_ORSim")) {
 
 plotTransferFunctions <- function(myColors, mean.color = "darkred") {
   
-  ## Dists of fur vals#
+  ## Dists of fur vals ----
   p_dfur0 <- myResults %>% 
     ggbetweenstats(
       data = ,
@@ -64,11 +67,9 @@ plotTransferFunctions <- function(myColors, mean.color = "darkred") {
       centrality.point.args = list(size = 5, color = mean.color),
       ggplot.component	= list(
         ggplot2::scale_color_manual(values = myColors),
-        ggplot2::scale_y_continuous(
-          name = expression(paste(delta^2 ~ H[fur], " (", "\u2030", ", VSMOW)") ),
-          limits = c(-65,35)
-        ),
-        ggplot2::xlab("Season Sampled / Analysis Laboratory")
+        ggplot2::scale_y_continuous(limits = c(-65,35) ),
+        ggplot2::xlab(expression(bold("Season sampled/analysis laboratory"))),
+        ggplot2::ylab(expression(bold(paste(delta^2 ~ H[fur], " (", "\u2030", ", VSMOW)") )))
       ),
       pairwise.display = "all", results.subtitle = FALSE
     )
@@ -82,7 +83,7 @@ plotTransferFunctions <- function(myColors, mean.color = "darkred") {
   p_dfur <- ggplot_gtable(p_dfur00) 
   
   
-  ## regression Plots ##
+  ## regression Plots ## ----
   sma_selected <- sma_results %>%
     dplyr::mutate_if(is.factor, as.character) %>%
     dplyr::arrange(desc(mean_r2)) %>%
@@ -125,15 +126,15 @@ plotTransferFunctions <- function(myColors, mean.color = "darkred") {
       slope = sma_selected$mean_slope
     ) +
     scale_x_continuous(
-      name = expression(paste(delta^2~H[precip]("\u2030", VSMOW))),
+      name = expression(bold(paste(delta^2~H[precip]("\u2030", VSMOW)))),
       limits = c(-60,-10)
     ) +
     scale_y_continuous(
-      name = expression(paste(delta^2~H[fur]("\u2030", VSMOW))),
+      name = expression(bold(paste(delta^2~H[fur]("\u2030", VSMOW)))),
       limits = c(-65, 10)
     ) +
-    scale_color_manual( name = "Analysis\nLaboratory", values = myColors , breaks = c("CASIF", "UWO")) +
-    scale_shape_manual( name = "Analysis\nLaboratory" , values =c(15, 16) , breaks = c("CASIF", "UWO")) +
+    scale_color_manual( name = "Analysis\nlaboratory", values = myColors , breaks = c("CASIF", "UWO")) +
+    scale_shape_manual( name = "Analysis\nlaboratory" , values =c(15, 16) , breaks = c("CASIF", "UWO")) +
     theme(
       legend.position = c(0.16,0.76),
       plot.subtitle = element_text(size = 10)
@@ -150,7 +151,7 @@ plotTransferFunctions <- function(myColors, mean.color = "darkred") {
     heights = c(5,1)
   )
   
-  # Source data plot
+  ## Source data plot ----
   p1 <- arrangeGrob(grobs = list(
     grid.arrange(p_dfur , top = grid::textGrob(label = 'A', x = 0, hjust = 0, gp = gpar(fontsize = 16))) , 
     grid.arrange(p_reg  , top = grid::textGrob(label = 'B', x = 0, hjust = 0, gp = gpar(fontsize = 16)))
@@ -178,7 +179,7 @@ myinterval <- -qnorm((1-0.95)/2)  # 95%
 makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red", "grey50")){
   suppressMessages({suppressWarnings({
     set.seed(42)
-    # Min dist by sex
+    ## Min dist by sex ----
     box_sex <- myResults %>% 
       filter(Season == "Winter") %>% 
       ggbetweenstats(
@@ -188,11 +189,14 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
         centrality.point.args = list(size = 5, color = mean.color),
         ggplot.component	= list(
           ggplot2::scale_color_manual(values = myColors),
-          scale_y_continuous( name = "Minimum Distance Moved (km)") ,
+          scale_y_continuous( name = "Minimum distance moved (km)") ,
           scale_x_discrete(position = "top") ,
           xlab("Sex"),
           ggpubr::theme_pubclean(),
-          theme(legend.position = "none")
+          theme(
+            legend.position = "none",
+            axis.title = element_text(face="bold")
+            )
         ),
         pairwise.display = "all", results.subtitle = TRUE
       )
@@ -201,7 +205,7 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
     box_sex <- grid.arrange(box_sex, bottom = textGrob(subtit, x = 0.55, y = 1, gp = gpar(fontsize = 11)))
     
     
-    # Min dist by hibernaculum size
+    ## Min dist by hibernaculum size ----
     box_size <- myResults %>% 
       filter(Season == "Winter") %>% 
       ggbetweenstats(
@@ -211,11 +215,14 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
         centrality.point.args = list(size = 5, color = mean.color),
         ggplot.component	= list(
           ggplot2::scale_color_manual(values = myColors),
-          scale_y_continuous( name = "Minimum Distance Moved (km)"),
+          scale_y_continuous( name = "Minimum distance moved (km)"),
           scale_x_discrete(position = "top") ,
-          xlab("Colony Size"),
+          xlab("Colony size"),
           ggpubr::theme_pubclean(),
-          theme(legend.position = "none")
+          theme(
+            legend.position = "none",
+            axis.title = element_text(face="bold")
+          )
           ),
         pairwise.display = "all", results.subtitle = TRUE
       )
@@ -223,7 +230,7 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
     box_size$labels$subtitle <- NULL
     box_size <- grid.arrange(box_size, bottom = textGrob(subtit, x = 0.55, y = 1, gp = gpar(fontsize = 11)))
     
-    # Min dist by region
+    ## Min dist by region ----
     box_region <- myResults %>% 
       filter(Season == "Winter") %>% 
       ggbetweenstats(
@@ -234,10 +241,13 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
         ggplot.component	= list(
           ggplot2::scale_color_manual(values = myColors),
           xlab("Karst Region"),
-          scale_y_continuous( name = "Minimum Distance Moved (km)"),
+          scale_y_continuous( name = "Minimum distance moved (km)"),
           scale_x_discrete(position = "top") ,
           ggpubr::theme_pubclean(),
-          theme(legend.position = "none")
+          theme(
+            legend.position = "none",
+            axis.title = element_text(face="bold")
+          )
         ),
         pairwise.display = "all", results.subtitle = TRUE
       )
@@ -245,8 +255,27 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
     box_region$labels$subtitle <- NULL
     box_region <- grid.arrange(box_region, bottom = textGrob(subtit, x = 0.55, y = 1, gp = gpar(fontsize = 11)))
     
-    # Model Outputs
-    coeff_plot <- ggplot(allModeldf, aes(colour = modelName, linetype = modelName)) + 
+    ## Model Outputs ----
+    # Manually change coefficient / model names.
+    allModeldf2 <- allModeldf %>% 
+      dplyr::mutate(
+        Variable = case_when(
+          Variable == "Sex (Male)" ~ "Sex (male)",
+          Variable == "Colony Size (Small)" ~ "Colony size (small)",
+          Variable == "Karst Region (N-C)" ~ "Karst region (N-C)",
+          TRUE ~ as.character(Variable)
+        ),
+        Variable = factor(Variable, levels = c("(Intercept)", "Sex (male)", "Colony size (small)", "Karst region (N-C)"
+        )),
+        modelName = case_when(
+          modelName == "Top Model" ~ "Top model",
+          modelName == "Global Model" ~ "Global model"
+        ),
+        modelName = factor(modelName, levels = c("Global model", "Top model"))
+      )
+    
+    
+    coeff_plot <- ggplot(allModeldf2, aes(colour = modelName, linetype = modelName)) + 
       geom_vline(xintercept = 0, colour = "grey20", lty = 5) +
       geom_pointrange(aes(y = Variable, x = Coefficient, xmin = Coefficient - SE*myinterval,
                           xmax = Coefficient + SE*myinterval),
@@ -255,7 +284,12 @@ makeBoxPlots <- function(myColors, mean.color = "darkred", coeffColors = c("red"
       ggpubr::theme_pubr() +
       scale_color_manual(values = coeffColors) +
       scale_linetype_manual(values = c(1,1)) +
-      theme(legend.position = c(0.16,0.1),  legend.box = "vertical", legend.title = element_blank())
+      theme(
+        legend.position = c(0.16,0.1),  
+        legend.box = "vertical", 
+        legend.title = element_blank(),
+        axis.title = element_text(face="bold")
+        )
     
     boxplots <- arrangeGrob(grobs = list(
       grid.arrange(box_region , top = grid::textGrob(label = 'A', x = 0, hjust = 0, gp = gpar(fontsize = 16))) , 
@@ -338,7 +372,7 @@ makeCompassRose <- function(myColors, add_n_labels = FALSE) {
     coord_polar(theta = "x", start = pi) +
     scale_fill_manual(
       values = myColors,
-      name = "Min. Distance\nTraveled") +
+      name = "Min. distance\ntraveled") +
     facet_wrap(~Region_long) +
     theme_bw() +
     theme(
@@ -351,7 +385,7 @@ makeCompassRose <- function(myColors, add_n_labels = FALSE) {
       axis.ticks = element_blank(),
       axis.ticks.x.top = element_line(),
       strip.background = element_blank(),
-      strip.text = element_text(size = 15),
+      strip.text = element_text(size = 15, face = "bold"),
       legend.position = c(0.51, -.03), legend.justification = c(0.5, 0),
       legend.background = element_rect(fill = NA),
       plot.margin = unit(c(0.1,0.1,0.1,0.1), "lines")
@@ -438,13 +472,14 @@ makeCompassBarPlots <- function(myColors = c("#f9de59", "#e8a628", "#f98365"), a
       aes(label = mylab), stat = "identity", position = position_stack(0.5),
       size = 3.5, hjust = 0.5, vjust = 0,lineheight = .8) +
     scale_fill_manual(values = myColors) +
-    scale_y_continuous(name = "Sample Size", limits = c(0,40)) +
-    scale_x_discrete(name = "Minimum Distance Traveled") +
+    scale_y_continuous(name = "Sample size", limits = c(0,40)) +
+    scale_x_discrete(name = "Minimum distance traveled") +
     theme_pubclean() +
     theme(
       strip.background = element_blank(),
       strip.text = element_blank(),
-      plot.margin = unit(c(0.1,0.1,0.1,0.1), "lines")
+      plot.margin = unit(c(0.1,0.1,0.1,0.1), "lines"),
+      axis.title = element_text(face = "bold")
     ) +
     guides(fill = "none")
   
@@ -468,7 +503,7 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
       st_transform(crs = myCRS)
   }
   
-  colorbarName <-  expression(paste("Cumulative Origins of ", italic("n"), " Individuals") )
+  colorbarName <-  expression(paste("Cumulative origins of ", italic("n"), " individuals") )
   
   ## North-Central ##
   ORSim_Northcentral <- distDir_ORSim %>% 
@@ -554,20 +589,19 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
   
   map_NC <- u +
     geom_point(samplingLocations_NC, mapping = aes(x=metersLongitude, y = metersLatitude), color = pointcol) +
-    labs(subtitle = "North-central Florida Hibernacula") +
+    labs(subtitle = "North-central Florida hibernacula") +
     # Southies
     annotate(
       geom = "text", 
       x=southiesLabelLocation[1]+5e4, y = southiesLabelLocation[2], color = "black",
       hjust = 0, size = textAnnotationSize,
-      label = "Sixteen bats moved\n>100km from southerly\nsummering grounds."
+      label = "Sixteen bats moved\n>100 km from southerly\nsummering grounds."
     ) +
     annotate(
       geom = "curve", x=southiesLabelLocation[1], y = southiesLabelLocation[2], 
       xend = southies$x[1], yend = southies$y[1],
       arrow = arrow(length = unit(0.03, "npc") ) )
 
-  
   
   ### NorthWest!!! ###
   ORSim_Northwest <- distDir_ORSim %>% 
@@ -589,7 +623,7 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
     geom_sf(na, mapping = aes(), fill= NA) +
     plot_params +
     scale_color_gradient( # I have no idea why I need to do this twice...
-      name = "Number of\nIndividuals" , low = "grey90", high = "black", na.value = NA,
+      name = "Number of\nindividuals" , low = "grey90", high = "black", na.value = NA,
       limits = c(0,40),
       guide = guide_colorbar(
         nbin = 300, barwidth=10, frame.colour=NA, frame.linewidth=1, 
@@ -621,7 +655,7 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
       geom = "text", 
       x=northiesLabelLocation[1]+5e4, y = northiesLabelLocation[2], color = "black",
       hjust = 0, size = textAnnotationSize,
-      label = "Three individuals moved\n>100km from northerly\nsummering grounds."
+      label = "Three individuals moved\n>100 km from northerly\nsummering grounds."
     ) +
     annotate(
       geom = "curve", x=northiesLabelLocation[1], y = northiesLabelLocation[2], 
@@ -640,7 +674,7 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
       geom = "text", 
       x=southiesLabelLocation[1]+5e4, y = southiesLabelLocation[2], color = "black",
       hjust = 0, size = textAnnotationSize,
-      label = "Thirty-two bats moved\n>100km from southerly\nsummering grounds."
+      label = "Thirty-two bats moved\n>100 km from southerly\nsummering grounds."
     ) +
     annotate(
       geom = "curve", x=southiesLabelLocation[1], y = southiesLabelLocation[2], 
@@ -648,7 +682,7 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
       arrow = arrow(length = unit(0.03, "npc") ) )
   #map_NW
   p_originMap <- ggpubr::ggarrange(map_NW, map_NC, ncol = 2, common.legend = T, legend = "bottom") %>%
-    annotate_figure(top = "Summer Origins of Regional- and Long-distance Migrators")
+    annotate_figure(top = text_grob("Summer origins of regional- and long-distance migrators", face = "bold", size = 15))
 
 }
 
