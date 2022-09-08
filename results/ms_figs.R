@@ -68,10 +68,15 @@ plotTransferFunctions <- function(myColors, mean.color = "darkred") {
       ggplot.component	= list(
         ggplot2::scale_color_manual(values = myColors),
         ggplot2::scale_y_continuous(limits = c(-65,35) ),
-        ggplot2::xlab(expression(bold("Season sampled/analysis laboratory"))),
+        ggplot2::scale_x_discrete(
+          expression(bold("Season sampled/analysis laboratory")),
+          breaks = c("Summer_CASIF", "Summer_UWO", "Winter_CASIF"),
+          labels = c("Summer\nCASIF", "Summer\nUWO", "Winter\nCASIF")
+          
+          ),
         ggplot2::ylab(expression(bold(paste(delta^2 ~ H[fur], " (", "\u2030", ", VSMOW)") )))
       ),
-      pairwise.display = "all", results.subtitle = FALSE
+      pairwise.comparisons = FALSE, results.subtitle = FALSE
     )
   
   
@@ -497,7 +502,7 @@ ggsave(p_circleBar_bw, file = file.path(wd$figs, "p_circleBar_bw.png"),
 
 # Summary Origin Maps -----------------------------------------------------
 
-plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol = "black", textAnnotationSize = 3.5) {
+plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol = "black", textAnnotationSize = 3.5, lineCol = "grey20") {
   if(!exists("na")){
     na <- rnaturalearth::ne_countries(country = c("United States of America", "Canada", "Mexico"), returnclass = "sf", scale = "large") %>% 
       st_transform(crs = myCRS)
@@ -588,20 +593,41 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
   southiesLabelLocation <- c(2e6-2e5, -1e6)
   
   map_NC <- u +
-    geom_point(samplingLocations_NC, mapping = aes(x=metersLongitude, y = metersLatitude), color = pointcol) +
+    geom_segment(
+      data = minCellLocations,
+      color = lineCol,
+      aes(x = x, y = y, xend = metersLongitude, yend = metersLatitude)
+    ) 
+  if(highCol == "black") {
+    map_NC <- map_NC +
+      geom_point(
+        samplingLocations_NC, mapping = aes(x=metersLongitude, y = metersLatitude), 
+        shape = 21, fill = "white",
+        color = pointcol
+      )
+  } else {
+    map_NC <- map_NC +
+      geom_point(
+        samplingLocations_NC, mapping = aes(x=metersLongitude, y = metersLatitude),
+        shape = 21, color = lineCol,
+        fill = pointcol
+      )
+  }
+  
+  map_NC <- map_NC +
     labs(subtitle = "North-central Florida hibernacula") +
     # Southies
     annotate(
       geom = "text", 
-      x=southiesLabelLocation[1]+5e4, y = southiesLabelLocation[2], color = "black",
+      x=southiesLabelLocation[1]-1e5, y = southiesLabelLocation[2]-3e5, color = "black",
       hjust = 0, size = textAnnotationSize,
-      label = "Sixteen bats moved\n>100 km from southerly\nsummering grounds."
-    ) +
-    annotate(
-      geom = "curve", x=southiesLabelLocation[1], y = southiesLabelLocation[2], 
-      xend = southies$x[1], yend = southies$y[1],
-      arrow = arrow(length = unit(0.03, "npc") ) )
-
+      label = "Sixteen bats (12.4%)\nmoved >100 km from\nsoutherly summering\ngrounds."
+    )  + 
+    coord_sf(
+      xlim = c( -5e5, 25e5),
+      ylim = c( -16e5, 11e5)
+    )
+  
   
   ### NorthWest!!! ###
   ORSim_Northwest <- distDir_ORSim %>% 
@@ -647,48 +673,54 @@ plotSummaryOriginMaps <- function(lowCol = "grey90", highCol = "black", pointcol
   samplingLocations_NW <- ORSim_Northwest %>% 
     dplyr::select(metersLongitude, metersLatitude) %>% 
     distinct
-
-  map_NW <- u  +
-    geom_point(samplingLocations_NW, mapping = aes(x=metersLongitude, y = metersLatitude), color = pointcol) +
+  
+  map_NW <- u +
+    geom_segment(
+      data = minCellLocations,
+      color = lineCol,
+      aes(x = x, y = y, xend = metersLongitude, yend = metersLatitude)
+    ) 
+  if(highCol == "black") {
+    map_NW <- map_NW +
+      geom_point(
+        samplingLocations_NW, mapping = aes(x=metersLongitude, y = metersLatitude), 
+        shape = 21, fill = "white",
+        color = pointcol
+      )
+  } else {
+    map_NW <- map_NW +
+      geom_point(
+        samplingLocations_NW, mapping = aes(x=metersLongitude, y = metersLatitude),
+        fill = pointcol, color = lineCol, shape = 21
+      )
+  }
+  map_NW <- map_NW +
+    annotate(
+      geom = "text", 
+      x=southiesLabelLocation[1]-1e5, y = southiesLabelLocation[2]-3e5, color = "black",
+      hjust = 0, size = textAnnotationSize,
+      label = "Thirty-two bats (28.8%)\nmoved >100 km from\nsoutherly summering\ngrounds."
+    ) +
+    annotate(
+      geom = "text", 
+      x=northiesLabelLocation[1], y = northiesLabelLocation[2], color = "black",
+      hjust = 0, size = textAnnotationSize,
+      label = "Three individuals (2.7%)\nmoved >100 km from\nnortherly summering\ngrounds."
+    ) +
     labs(subtitle = "Northwest Florida hibernacula") +
-    annotate(
-      geom = "text", 
-      x=northiesLabelLocation[1]+5e4, y = northiesLabelLocation[2], color = "black",
-      hjust = 0, size = textAnnotationSize,
-      label = "Three individuals moved\n>100 km from northerly\nsummering grounds."
-    ) +
-    annotate(
-      geom = "curve", x=northiesLabelLocation[1], y = northiesLabelLocation[2], 
-      xend = northies$x[1], yend = northies$y[1],
-      arrow = arrow(length = unit(0.03, "npc") ) ) +
-    annotate(
-      geom = "curve", x=northiesLabelLocation[1], y = northiesLabelLocation[2], 
-      xend = northies$x[2], yend = northies$y[2],
-      arrow = arrow(length = unit(0.03, "npc") ) ) +
-    annotate(
-      geom = "curve", x=northiesLabelLocation[1], y = northiesLabelLocation[2], 
-      xend = northies$x[3], yend = northies$y[3],
-      arrow = arrow(length = unit(0.03, "npc") ) ) +
-    # Southies
-    annotate(
-      geom = "text", 
-      x=southiesLabelLocation[1]+5e4, y = southiesLabelLocation[2], color = "black",
-      hjust = 0, size = textAnnotationSize,
-      label = "Thirty-two bats moved\n>100 km from southerly\nsummering grounds."
-    ) +
-    annotate(
-      geom = "curve", x=southiesLabelLocation[1], y = southiesLabelLocation[2], 
-      xend = southies$x[1], yend = southies$y[1],
-      arrow = arrow(length = unit(0.03, "npc") ) )
+    coord_sf(
+      xlim = c( -4e5, 26e5),
+      ylim = c( -16e5, 11e5)
+    ) 
   #map_NW
   p_originMap <- ggpubr::ggarrange(map_NW, map_NC, ncol = 2, common.legend = T, legend = "bottom") %>%
-    annotate_figure(top = text_grob("Summer origins of regional- and long-distance migrators", face = "bold", size = 15))
-
+    annotate_figure(top = text_grob("Summer origins of regional- and long-distance migratory tricolored bats", face = "bold", size = 15))
+  
 }
 
 p_originMap_col <- plotSummaryOriginMaps(lowCol = "#BFE1B0", highCol = "#0A2F51", pointcol = "#A30808")
 ggsave(p_originMap_col, filename = file.path(wd$figs, "p_originMap_col.png"),
-       units = "in", width = 12, height = 6)
+       units = "in", width = 12, height = 6.5)
 
 
 p_originMap_bw <- plotSummaryOriginMaps(lowCol = "grey90", highCol = "black")
@@ -736,3 +768,134 @@ myResults %>% group_by(Season) %>% dplyr::summarise(mean=mean(probDistTraveledAt
 myResults %>% filter(Season == "Winter") %>% group_by(distanceTraveled) %>% dplyr::summarise(n=n())
 
 myResults %>% filter(Season == "Winter", NorthOrSouth == "North", distanceTraveled != "Resident") %>% dplyr::summarise(probDistTraveledAtThreshold_0.25 = probDistTraveledAtThreshold_0.25)
+
+
+
+# SI figure -- plot of known-origin sample locations -------------------------------------------------------
+
+# Load known-origin values.
+mydata_isoVals <- readRDS(file.path(wd$bin, "mydata_isoVals.Rds"))
+mydata_isoVals_knownOrigin <- mydata_isoVals %>%
+  dplyr::filter(Season == "Summer")
+
+# Load GADM data for mapping.
+NoAm <- readRDS(file.path(wd$bin, "NoAm.rds")) %>% 
+  st_as_sf()
+
+# Load rangemap
+## Crop Polygon above the tropics.
+NoAm_boundary_aea <- readRDS( file.path(wd$bin, "NoAm_boundary_aea.rds") )
+NoAm_aboveTropics <- st_multipoint(rbind(c(-110, 23.4366), c(-50,50)), crs) %>% 
+  st_sfc() %>% 
+  st_set_crs(., "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") %>% 
+  st_transform(myCRS) %>% 
+  st_bbox() %>% 
+  st_as_sfc() %>%
+  st_intersection(., NoAm_boundary_aea)
+
+### Load candidate rangemaps.
+# Convert to simple features object and reproject to myCRS.
+range_PESU <- list.dirs(wd$iucn) %>% 
+  grep(pattern = "species_data", value = T) %>% 
+  rgdal::readOGR(dsn = ., layer = "data_0") %>% 
+  st_as_sf(crs = 4326) %>%
+  st_transform(crs = myCRS) %>%
+  st_simplify(preserveTopology = TRUE, dTolerance = 5000) %>%
+  st_make_valid() %>%
+  st_buffer(dist = 10e3) 
+
+anti_range_PESU <- st_difference(NoAm, range_PESU)
+
+# Load isoscape.
+plotExtent <- c(-10e5, 30e5,  -20e5, 15e5)
+load(file.path(wd$bin, "bestFitIso.rdata"))
+iso0 <- mask(bestFitIso$isoscape, NoAm)
+iso1 <- crop(iso0, extent(plotExtent))
+iso <- SDMetrics::surface2df(iso1)
+
+# Plot maps.
+known_origin_maps <- ggplot() +
+  geom_tile(
+    iso, mapping = aes(fill = value, color = value, x=x, y=y)
+  ) +
+  scale_color_viridis_c(option = "turbo", limits = c(-70, 0), name = expression(bold(paste(delta^2~H[precip]("\u2030", VSMOW))))) +
+  scale_fill_viridis_c( option = "turbo", limits = c(-70, 0), name = expression(bold(paste(delta^2~H[precip]("\u2030", VSMOW))))) +
+  ggnewscale::new_scale_color() +
+  ggnewscale::new_scale_fill() +
+  geom_point(
+    mydata_isoVals_knownOrigin,
+    mapping = aes(x=metersLongitude, y=metersLatitude, shape = analysisLab, fill = analysisLab)
+    ) +  
+  scale_fill_manual(
+    name = "Analysis\nlaboratory",
+    values = c("grey10", "white")
+  ) +
+  scale_shape_manual(
+    name = "Analysis\nlaboratory",
+    values = c(21, 23)
+    ) +
+  geom_sf(anti_range_PESU, mapping = aes(),
+          fill = "grey50", alpha = 0.7) +
+  geom_sf(NoAm, mapping = aes(), fill = NA) +
+  coord_sf(
+    xlim = c( -5e5, 25e5),
+    ylim = c( -16e5, 11e5)
+    ) +
+  theme(axis.title = element_blank())
+ggsave(known_origin_maps, file = file.path(wd$figs, "SI_Fig1_map.png"))
+
+
+## residuals
+sma_residual <- function(x, y, m, b) {
+  m_resid = -m
+  b_resid = y - (x*m_resid)
+  x_projected = -1*((b-b_resid)/(m-m_resid))
+  y_projected = m*x_projected+b
+  residual = sqrt( (x_projected-x)^2 + (y_projected-y)^2 )
+  return(residual)
+}
+
+myResults2 <- lapply(1:nrow(mydata_isoVals), function(i) {
+  sma_residual(
+    y = mydata_isoVals$fur_adjusted[i],
+    x = mydata_isoVals$precip_val_66098[i],
+    m = sma_selected$mean_slope,
+    b = sma_selected$mean_intercept
+  )
+}) %>% 
+  unlist %>% 
+  data.frame(ID = mydata_isoVals$ID, resid_calc = .) %>% 
+  full_join(myResults)
+
+# All three. Expect differences on winter and summer, not analysisLab.
+ggbetweenstats(data = myResults2, x = seasonLab, y = resid_calc)
+# And for only known-origin:
+ggbetweenstats(data = dplyr::filter(myResults2, Season == "Summer"), x = seasonLab, y = resid_calc)
+
+
+## Dists of fur vals ----
+myResults2 <- dplyr::mutate(myResults2, seasonLab = factor(myResults2, levels = c("")))
+p_resid1 <- myResults2 %>% 
+  ggbetweenstats(
+    data = ,
+    y = resid_calc,
+    x = seasonLab,
+    type = "r",
+    centrality.point.args = list(size = 5, color ="darkred"),
+    ggplot.component	= list(
+      ggplot2::scale_color_manual(values = c("#440154FF", "#21908CFF", "#FDE725FF")),
+      ggplot2::xlab(expression(bold("Season sampled / analysis laboratory"))),
+      ggplot2::ylab(expression(bold("SMA residuals")))
+    ),
+    pairwise.display = "significant", results.subtitle = FALSE
+  )
+
+
+p_resid100 <- ggplot_build(p_resid1)
+# Remove caption.
+p_resid100$plot$labels$caption <- NULL
+# Gotta get hackey to change the shapes...
+p_resid100$data[[1]][ , "shape"] <- if_else(p_resid100$data[[1]][ , "group"] == 1, 15, 16)
+p_resid <- ggplot_gtable(p_resid100) 
+ggsave(p_resid, file = file.path(wd$figs, "SI_Fig2_resid.png"), width = 6, height = 4)
+
