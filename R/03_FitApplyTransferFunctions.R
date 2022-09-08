@@ -155,6 +155,7 @@ sma_results <- sma_results_litDates_raw %>%
 
 saveRDS(sma_results, file = file.path(wd$bin, "sma_results.rds"))
 
+
 # Select transfer functions to apply. ----------------------------
 
 sma_selected <- sma_results %>%
@@ -163,6 +164,15 @@ sma_selected <- sma_results %>%
   slice(1)
 
 
+# Calculate residuals -----------------------------------------------------
+
+# Make temporary model.
+mod0 <- smatr::sma(precip_val_66098~fur_adjusted,data = mydata_isoVals_knownOrigin)
+# Replace coefficients with those estimated.
+mod0$coef[[1]][ ,1] <- c(sma_selected$mean_intercept, sma_selected$mean_slope)
+myresiduals <- residuals(mod0)
+df_resids <- data.frame(ID = mydata_isoVals_knownOrigin$ID, known_origin_resid = myresiduals)
+
 # Apply transfer functions, define molt status  ---------------------------------
 
 mydata_transformed <- mydata %>%
@@ -170,7 +180,8 @@ mydata_transformed <- mydata %>%
   dplyr::mutate(
     dDprecip =  (fur_adjusted - sma_selected$mean_intercept) / sma_selected$mean_slope,
     sdResid = sma_selected$mean_sdRes
-  )
+  ) %>% 
+  full_join(df_resids, by = "ID")
 
 saveRDS(mydata_transformed, file = file.path(wd$bin, "mydata_transformed.rds"))
 
