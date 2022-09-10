@@ -56,7 +56,7 @@ if(!exists("distDir_ORSim")) {
 # Transfer function plots ---------------------------------------------------
 
 plotTransferFunctions <- function(myColors, mean.color = "darkred") {
-  
+  set.seed(42)
   ## Dists of fur vals ----
   p_dfur0 <- myResults %>% 
     ggbetweenstats(
@@ -72,7 +72,10 @@ plotTransferFunctions <- function(myColors, mean.color = "darkred") {
           expression(bold("Season sampled/analysis laboratory")),
           breaks = c("Summer_CASIF", "Summer_UWO", "Winter_CASIF"),
           labels = c("Summer\nCASIF", "Summer\nUWO", "Winter\nCASIF")
-          
+          ),
+        ggplot2::theme(
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank()
           ),
         ggplot2::ylab(expression(bold(paste(delta^2 ~ H[fur], " (", "\u2030", ", VSMOW)") )))
       ),
@@ -855,6 +858,13 @@ sma_residual <- function(x, y, m, b) {
   return(residual)
 }
 
+sma_results <- readRDS(file.path(wd$bin, "sma_results.rds"))
+
+sma_selected <- sma_results %>%
+  dplyr::mutate_if(is.factor, as.character) %>%
+  dplyr::arrange(desc(mean_r2)) %>%
+  slice(1)
+
 myResults2 <- lapply(1:nrow(mydata_isoVals), function(i) {
   sma_residual(
     y = mydata_isoVals$fur_adjusted[i],
@@ -885,7 +895,8 @@ p_resid1 <- myResults2 %>%
     ggplot.component	= list(
       ggplot2::scale_color_manual(values = c("#440154FF", "#21908CFF", "#FDE725FF")),
       ggplot2::xlab(expression(bold("Season sampled / analysis laboratory"))),
-      ggplot2::ylab(expression(bold("SMA residuals")))
+      ggplot2::ylab(expression(bold("SMA residuals"))),
+      ggplot2::theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
     ),
     pairwise.display = "significant", results.subtitle = FALSE
   )
